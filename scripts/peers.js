@@ -32,16 +32,21 @@ mongoose.connect(dbString, function(err) {
         var i = loop.iteration();
         var address = body[i].addr.split(':')[0];
 
-	    request({uri: 'http://freegeoip.net/json/' + address, json: true}, function (error, response, geo) {
-          db.create_peer({
-              address: address,
-              protocol: body[i].version,
-              version: body[i].subver.replace('/', '').replace('/', ''),
-              country: geo.country_name
-          }, function(){
-            loop.next();
+	if (address == "127.0.0.1") {
+          // local peer, ignored
+          loop.next();
+        } else {
+	  request({uri: 'http://freegeoip.net/json/' + address, json: true}, function (error, response, geo) {
+            db.create_peer({
+                address: address,
+                protocol: body[i].version,
+                version: body[i].subver.replace('/', '').replace('/', ''),
+                country: geo.country_name
+            }, function(){
+              loop.next();
+            });
           });
-        });
+        }
       }, function() {
         exit();
       });
