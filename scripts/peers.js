@@ -27,6 +27,8 @@ mongoose.connect(dbString, function(err) {
  
     db.delete_peers();
 
+    var k=0;
+
     request({uri: 'http://127.0.0.1:' + settings.port + '/api/getpeerinfo', json: true}, function (error, response, body) {
       lib.syncLoop(body.length, function (loop) {
         var i = loop.iteration();
@@ -43,11 +45,17 @@ mongoose.connect(dbString, function(err) {
                 version: body[i].subver.replace('/', '').replace('/', ''),
                 country: geo.country_name
             }, function(){
+              k++;
               loop.next();
             });
           });
         }
       }, function() {
+        if (k > 1) {
+          console.log('peers update complete (%s', k, ' peers)');
+        } else {
+          console.log('peers update complete (%s', k, ' peer)');
+        }
         exit();
       });
     });
