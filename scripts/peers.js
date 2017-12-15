@@ -34,8 +34,8 @@ mongoose.connect(dbString, function(err) {
         var i = loop.iteration();
         var address = body[i].addr.split(':')[0];
 
-	if (address == "127.0.0.1") {
-          // local peer, ignored
+	if (address == "127.0.0.1" || body[i].inbound == true) {
+          // local peer or inbound peer, ignored
           loop.next();
         } else {
 	  request({uri: 'http://freegeoip.net/json/' + address, json: true}, function (error, response, geo) {
